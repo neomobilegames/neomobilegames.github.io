@@ -1,0 +1,40 @@
+sudo mkdir -p /var/hosting/neosnapshot.com/html
+sudo chown -R $USER:$USER /var/hosting/neosnapshot.com/html
+sudo chmod -R 777 /var/hosting/neosnapshot.com
+nano /var/hosting/neosnapshot.com/html/index.html
+
+	<h1>neosnapshot.com website is running.</h1>
+
+
+sudo nano /etc/nginx/sites-available/neosnapshot.com
+
+server {
+        listen 80;
+        root /var/hosting/neosnapshot.com/html;
+        index index.php index.html index.htm index.nginx-debian.html;
+        server_name neosnapshot.com www.neosnapshot.com;
+
+        location / {
+                try_files $uri $uri/ =404;
+        }
+
+        location ~ \.php$ {
+                include snippets/fastcgi-php.conf;
+                fastcgi_pass unix:/var/run/php/php7.2-fpm.sock;
+        }
+
+        location ~ /\.ht {
+                deny all;
+        }
+}
+
+sudo ln -s /etc/nginx/sites-available/neosnapshot.com /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl restart nginx
+
+sudo service nginx reload
+
+sudo certbot --nginx -d neosnapshot.com -d www.neosnapshot.com
+sudo certbot renew --dry-run
+
+
